@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ԵՊԲՀ Հերացի ավագ դպրոց — Տրանսպորտային Հոսքերի Մոդելավորում</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --bg-0: #080808;
+    --bg-1: #0f0f0f;
+    --bg-2: #161616;
+    --bg-3: #1e1e1e;
+    --border: rgba(255,255,255,0.07);
+    --text-primary: #f0f0f0;
+    --text-secondary: #888;
+    --text-muted: #555;
+    --accent: #00d4aa;
+    --accent-dim: rgba(0,212,170,0.15);
+    --accent-glow: rgba(0,212,170,0.4);
+    --blue: #3b82f6;
+    --orange: #f97316;
+    --red: #ef4444;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; font-size: 16px; }
+
+  body {
+    background: var(--bg-0);
+    color: var(--text-primary);
+    font-family: 'Segoe UI', 'Helvetica Neue', system-ui, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg-0); }
+  ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+  /* ───── NAV ───── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5vw;
+    height: 64px;
+    background: rgba(8,8,8,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 700; font-size: 1rem; letter-spacing: -0.02em;
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .logo-icon {
+    width: 32px; height: 32px; flex-shrink: 0;
+  }
+
+  .nav-links {
+    display: flex; gap: 32px; list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ───── HERO ───── */
+  #hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 80px 5vw 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(0,212,170,0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 60% 40% at 80% 80%, rgba(59,130,246,0.05) 0%, transparent 60%);
+  }
+
+  .hero-grid {
+    position: absolute; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 0%, transparent 100%);
+  }
+
+  .hero-content { position: relative; z-index: 1; max-width: 860px; }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent-dim);
+    border: 1px solid rgba(0,212,170,0.3);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  h1.hero-title {
+    font-size: clamp(2.4rem, 5vw, 4.2rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.6) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-title .accent { 
+    -webkit-text-fill-color: transparent;
+    background: linear-gradient(135deg, var(--accent), #00b4d8);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: var(--text-secondary);
+    max-width: 640px;
+    margin: 0 auto 40px;
+    line-height: 1.7;
+  }
+
+  .hero-cta {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--accent);
+    color: #000;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 14px 28px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    letter-spacing: 0.01em;
+  }
+
+  .hero-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px var(--accent-glow);
+  }
+
+  .hero-scroll-hint {
+    position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-6px); }
+  }
+
+  /* ───── SECTIONS ───── */
+  section {
+    padding: 100px 5vw;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  h2.section-title {
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+  }
+
+  .section-intro {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    max-width: 680px;
+    line-height: 1.75;
+    margin-bottom: 64px;
+  }
+
+  /* ───── CARDS ───── */
+  .card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+
+  .card:hover {
+    border-color: rgba(0,212,170,0.25);
+    transform: translateY(-4px);
+  }
+
+  .card-icon {
+    width: 44px; height: 44px;
+    background: var(--accent-dim);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+    font-size: 20px;
+  }
+
+  .card h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+  }
+
+  .card p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  /* ───── THEORY GRID ───── */
+  .theory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 64px;
+  }
+
+  /* ───── FORMULA BOX ───── */
+  .formula-block {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin: 32px 0;
+  }
+
+  .formula-block h4 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .formula {
+    font-family: 'Courier New', monospace;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+
+  .formula sup { font-size: 0.65em; vertical-align: super; }
+  .formula sub { font-size: 0.65em; vertical-align: sub; }
+
+  .formula-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+  }
+
+  .formula-desc strong { color: var(--text-primary); }
+
+  /* ───── DIAGRAM CONTAINER ───── */
+  .diagram-wrap {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin: 32px 0;
+  }
+
+  .diagram-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  canvas { display: block; max-width: 100%; }
+
+  /* ───── SIMULATION ───── */
+  #simulation { max-width: 1200px; }
+
+  .sim-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  @media (max-width: 768px) {
+    .sim-layout { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+
+  .sim-canvas-wrap {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .sim-canvas-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .sim-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .sim-dot.red { background: #ff5f57; }
+  .sim-dot.yellow { background: #ffbd2e; }
+  .sim-dot.green { background: #28c840; }
+
+  #simCanvas {
+    width: 100%;
+    background: #060a0f;
+    display: block;
+  }
+
+  .sim-controls {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+
+  .sim-controls h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: var(--text-primary);
+  }
+
+  .control-group { margin-bottom: 28px; }
+
+  .control-label {
+    display: flex; justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+
+  .control-value {
+    color: var(--accent);
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--bg-3);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 8px var(--accent-glow);
+    transition: transform 0.15s;
+  }
+
+  input[type=range]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+  }
+
+  .metrics-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .metric-card {
+    background: var(--bg-3);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+
+  .metric-val {
+    font-size: 1.4rem;
+    font-weight: 800;
+    font-family: 'Courier New', monospace;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .metric-label {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .sim-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 16px;
+    background: var(--accent-dim);
+    border: 1px solid rgba(0,212,170,0.3);
+    border-radius: 8px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.03em;
+  }
+
+  .sim-btn:hover {
+    background: var(--accent);
+    color: #000;
+    transform: translateY(-1px);
+  }
+
+  /* ───── LWR SECTION ───── */
+  .lwr-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: center;
+  }
+
+  @media (max-width: 768px) {
+    .lwr-container { grid-template-columns: 1fr; }
+  }
+
+  /* ───── SOLUTION ───── */
+  .solution-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 48px;
+  }
+
+  @media (max-width: 900px) {
+    .solution-grid { grid-template-columns: 1fr; }
+  }
+
+  .solution-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s;
+  }
+
+  .solution-card:hover { transform: translateY(-6px); }
+
+  .solution-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), #00b4d8);
+  }
+
+  .solution-num {
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--border);
+    line-height: 1;
+    margin-bottom: 16px;
+    font-family: 'Courier New', monospace;
+  }
+
+  .solution-card h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+  }
+
+  .solution-card p {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  /* ───── DIVIDER ───── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 0 5vw;
+  }
+
+  /* ───── FOOTER ───── */
+  footer {
+    padding: 60px 5vw;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    background: var(--bg-1);
+  }
+
+  .footer-logo {
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+  }
+
+  .footer-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .footer-text strong { color: var(--accent); }
+
+  /* ───── SVG NETWORK ───── */
+  .network-svg-wrap {
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+  }
+
+  /* Fade-in animations */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Tag badges */
+  .tag {
+    display: inline-block;
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin: 4px 2px;
+  }
+
+  .highlight-text {
+    color: var(--accent);
+  }
+
+  /* Full-width hero network */
+  .hero-network {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 200px;
+    opacity: 0.25;
+    pointer-events: none;
+    z-index: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════ NAV -->
+<nav>
+  <a class="nav-logo" href="#hero">
+    <svg class="logo-icon" viewBox="0 0 32 32" fill="none">
+      <rect x="2" y="14" width="28" height="4" rx="2" fill="#00d4aa" opacity="0.2"/>
+      <rect x="2" y="14" width="28" height="4" rx="2" fill="none" stroke="#00d4aa" stroke-width="1.5"/>
+      <circle cx="8" cy="16" r="3" fill="#00d4aa"/>
+      <circle cx="20" cy="16" r="3" fill="#00d4aa" opacity="0.7"/>
+      <circle cx="28" cy="16" r="2" fill="#00d4aa" opacity="0.4"/>
+      <path d="M2 20 Q8 24 16 22 Q24 20 30 24" stroke="#3b82f6" stroke-width="1" fill="none" opacity="0.5"/>
+      <path d="M2 12 Q8 8 16 10 Q24 12 30 8" stroke="#00d4aa" stroke-width="1" fill="none" opacity="0.5"/>
+    </svg>
+    ԵՊԲՀ Հերացի ավագ դպրոց
+  </a>
+  <ul class="nav-links">
+    <li><a href="#intro">Ներածություն</a></li>
+    <li><a href="#theory">Տեսություն</a></li>
+    <li><a href="#simulation">Սիմուլյացիա</a></li>
+    <li><a href="#solution">Լուծում</a></li>
+  </ul>
+</nav>
+
+<!-- ═══════════════════════════════════════════════ HERO -->
+<section id="hero" style="padding: 0; max-width: none;">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+
+  <div class="hero-content fade-in">
+    <div class="hero-badge">Նախագիծ · 2026</div>
+    <h1 class="hero-title">
+      Մաթեմատիկան<br><span class="accent">ընդդեմ խցանումների</span>
+    </h1>
+    <p class="hero-sub">
+      Ինչպե՞ս են մաթեմատիկական մոդելները օգնում հասկանալ, կանխատեսել
+      և կանխարգելել քաղաքային տրանսպորտային հոսքերի կատաստրոֆաները։
+    </p>
+    <a href="#simulation" class="hero-cta">
+      ▶ Գործարկել Սիմուլյացիան
+    </a>
+  </div>
+
+  <!-- Network SVG Hero Visual -->
+  <svg class="hero-network" viewBox="0 0 1200 200" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <linearGradient id="roadGrad" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0%" stop-color="#00d4aa" stop-opacity="0"/>
+        <stop offset="30%" stop-color="#00d4aa" stop-opacity="1"/>
+        <stop offset="70%" stop-color="#00d4aa" stop-opacity="1"/>
+        <stop offset="100%" stop-color="#00d4aa" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <!-- Horizontal roads -->
+    <line x1="0" y1="60" x2="1200" y2="60" stroke="url(#roadGrad)" stroke-width="1.5"/>
+    <line x1="0" y1="120" x2="1200" y2="120" stroke="url(#roadGrad)" stroke-width="1.5"/>
+    <line x1="0" y1="170" x2="1200" y2="170" stroke="url(#roadGrad)" stroke-width="0.8" stroke-opacity="0.5"/>
+    <!-- Vertical intersections -->
+    <line x1="200" y1="0" x2="200" y2="200" stroke="#00d4aa" stroke-width="1" stroke-opacity="0.4"/>
+    <line x1="500" y1="0" x2="500" y2="200" stroke="#00d4aa" stroke-width="1" stroke-opacity="0.4"/>
+    <line x1="800" y1="0" x2="800" y2="200" stroke="#00d4aa" stroke-width="1" stroke-opacity="0.4"/>
+    <line x1="1050" y1="0" x2="1050" y2="200" stroke="#00d4aa" stroke-width="1" stroke-opacity="0.3"/>
+    <!-- Intersection glow dots -->
+    <circle cx="200" cy="60" r="4" fill="#00d4aa"/>
+    <circle cx="500" cy="60" r="4" fill="#00d4aa" fill-opacity="0.7"/>
+    <circle cx="800" cy="120" r="4" fill="#00d4aa"/>
+    <circle cx="200" cy="120" r="4" fill="#3b82f6"/>
+    <circle cx="500" cy="120" r="4" fill="#3b82f6" fill-opacity="0.7"/>
+    <circle cx="1050" cy="60" r="4" fill="#00d4aa" fill-opacity="0.5"/>
+    <circle cx="1050" cy="120" r="3" fill="#3b82f6" fill-opacity="0.5"/>
+    <!-- Diagonal connector -->
+    <path d="M 200 60 Q 350 90 500 120" stroke="#3b82f6" stroke-width="1" fill="none" stroke-opacity="0.5"/>
+    <path d="M 500 60 Q 650 90 800 120" stroke="#f97316" stroke-width="1" fill="none" stroke-opacity="0.4"/>
+  </svg>
+
+  <div class="hero-scroll-hint">
+    <svg width="16" height="20" viewBox="0 0 16 20" fill="none">
+      <rect x="5" y="1" width="6" height="10" rx="3" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="8" cy="5" r="1.5" fill="currentColor" opacity="0.7"/>
+      <path d="M4 16l4 3 4-3" stroke="currentColor" stroke-width="1.5" fill="none"/>
+    </svg>
+    Ոլորել ներքև
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════ INTRO -->
+<section id="intro">
+  <div class="fade-in">
+    <span class="section-label">01 — Ներածություն</span>
+    <h2 class="section-title">Ինչու՞ ենք ուսումնասիրում տրանսպորտային հոսքերը</h2>
+    <p class="section-intro">
+      Ժամանակակից քաղաքներում տրանսպորտային խցանումները ոչ միայն անհարմարություն, 
+      այլ տնտեսական կորուստ, բնապահպանական վնաս և կյանքի որակի անկում են։ 
+      Մաթեմատիկայի և ֆիզիկայի օրենքները թույլ են տալիս մոդելավորել, կանխատեսել 
+      և կանխարգելել այս երևույթները։
+    </p>
+  </div>
+
+  <div class="theory-grid fade-in">
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <h3>Մակրոսկոպիկ Մոդելներ</h3>
+      <p>Տրանսպորտային հոսքն ուսումնասիրվում է որպես շարունակական հեղուկ՝ 
+      օգտագործելով դիֆֆերենցիալ հավասարումների համակարգ, որն արտացոլում է 
+      ամբողջ հոսքի վարքը։</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🚗</div>
+      <h3>Միկրոսկոպիկ Մոդելներ</h3>
+      <p>Յուրաքանչյուր մեքենա ուսումնասիրվում է առանձին՝ հաշվի առնելով 
+      հեռավորությունը, արագությունը, արձագանքման ժամանակը և վարորդի 
+      ռեֆլեքտիվ վարքը։</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌐</div>
+      <h3>Ցանցային Տեսություն</h3>
+      <p>Ճանապարհային ցանցը մոդելավորվում է որպես գրաֆ, որտեղ անկյունաձողերն 
+      ճանապարհամիջուկներ են, իսկ կողերն ուղիները՝ կշռված ժամանակի, 
+      հզորության և ծախսերի չափանիշներով։</p>
+    </div>
+  </div>
+
+  <!-- Network SVG Illustration -->
+  <div class="network-svg-wrap fade-in">
+    <svg viewBox="0 0 800 300" width="100%" style="display:block">
+      <defs>
+        <radialGradient id="nodeGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#00d4aa" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="#00d4aa" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="blur4">
+          <feGaussianBlur stdDeviation="3"/>
+        </filter>
+        <marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#00d4aa" opacity="0.7"/>
+        </marker>
+        <marker id="arrB" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#3b82f6" opacity="0.7"/>
+        </marker>
+      </defs>
+
+      <!-- Background subtle roads -->
+      <rect width="800" height="300" fill="#0f0f0f"/>
+      
+      <!-- Road network paths -->
+      <!-- Main horizontal arteries -->
+      <line x1="0" y1="100" x2="800" y2="100" stroke="#1e2a1e" stroke-width="20"/>
+      <line x1="0" y1="100" x2="800" y2="100" stroke="#00d4aa" stroke-width="1.5" stroke-dasharray="8,6" opacity="0.4"/>
+
+      <line x1="0" y1="200" x2="800" y2="200" stroke="#1e2a1e" stroke-width="20"/>
+      <line x1="0" y1="200" x2="800" y2="200" stroke="#00d4aa" stroke-width="1.5" stroke-dasharray="8,6" opacity="0.4"/>
+
+      <!-- Vertical roads -->
+      <line x1="150" y1="0" x2="150" y2="300" stroke="#1e2a1e" stroke-width="16"/>
+      <line x1="150" y1="0" x2="150" y2="300" stroke="#00d4aa" stroke-width="1" stroke-dasharray="6,6" opacity="0.3"/>
+
+      <line x1="350" y1="0" x2="350" y2="300" stroke="#1e2a1e" stroke-width="16"/>
+      <line x1="350" y1="0" x2="350" y2="300" stroke="#00d4aa" stroke-width="1" stroke-dasharray="6,6" opacity="0.3"/>
+
+      <line x1="600" y1="0" x2="600" y2="300" stroke="#1e2a1e" stroke-width="16"/>
+      <line x1="600" y1="0" x2="600" y2="300" stroke="#00d4aa" stroke-width="1" stroke-dasharray="6,6" opacity="0.3"/>
+
+      <!-- Diagonal connector -->
+      <line x1="150" y1="100" x2="350" y2="200" stroke="#3b82f640" stroke-width="12"/>
+      <line x1="150" y1="100" x2="350" y2="200" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.5"/>
+
+      <line x1="350" y1="100" x2="600" y2="200" stroke="#f9731640" stroke-width="12"/>
+      <line x1="350" y1="100" x2="600" y2="200" stroke="#f97316" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.4"/>
+
+      <!-- Traffic arrows -->
+      <line x1="30" y1="95" x2="140" y2="95" stroke="#00d4aa" stroke-width="2" marker-end="url(#arr)" opacity="0.7"/>
+      <line x1="170" y1="95" x2="330" y2="95" stroke="#00d4aa" stroke-width="2" marker-end="url(#arr)" opacity="0.7"/>
+      <line x1="370" y1="95" x2="580" y2="95" stroke="#00d4aa" stroke-width="2" marker-end="url(#arr)" opacity="0.7"/>
+      <line x1="620" y1="95" x2="770" y2="95" stroke="#00d4aa" stroke-width="2" marker-end="url(#arr)" opacity="0.5"/>
+
+      <!-- Intersection nodes with glow -->
+      <!-- Node: 150,100 -->
+      <circle cx="150" cy="100" r="18" fill="url(#nodeGlow)" filter="url(#blur4)"/>
+      <circle cx="150" cy="100" r="9" fill="#0f0f0f" stroke="#00d4aa" stroke-width="2"/>
+      <circle cx="150" cy="100" r="4" fill="#00d4aa"/>
+
+      <!-- Node: 350,100 — congested (orange) -->
+      <circle cx="350" cy="100" r="22" fill="#f9731620" filter="url(#blur4)"/>
+      <circle cx="350" cy="100" r="10" fill="#0f0f0f" stroke="#f97316" stroke-width="2.5"/>
+      <circle cx="350" cy="100" r="5" fill="#f97316"/>
+      <text x="350" y="80" text-anchor="middle" font-size="9" fill="#f97316" font-family="sans-serif" font-weight="600">⚠ ԽՑԱՆՈՒՄ</text>
+
+      <!-- Node: 600,100 -->
+      <circle cx="600" cy="100" r="18" fill="url(#nodeGlow)" filter="url(#blur4)"/>
+      <circle cx="600" cy="100" r="9" fill="#0f0f0f" stroke="#00d4aa" stroke-width="2"/>
+      <circle cx="600" cy="100" r="4" fill="#00d4aa"/>
+
+      <!-- Node: 150,200 -->
+      <circle cx="150" cy="200" r="18" fill="url(#nodeGlow)" filter="url(#blur4)"/>
+      <circle cx="150" cy="200" r="9" fill="#0f0f0f" stroke="#00d4aa" stroke-width="2"/>
+      <circle cx="150" cy="200" r="4" fill="#00d4aa"/>
+
+      <!-- Node: 350,200 -->
+      <circle cx="350" cy="200" r="18" fill="url(#nodeGlow)" filter="url(#blur4)"/>
+      <circle cx="350" cy="200" r="9" fill="#0f0f0f" stroke="#3b82f6" stroke-width="2"/>
+      <circle cx="350" cy="200" r="4" fill="#3b82f6"/>
+
+      <!-- Node: 600,200 -->
+      <circle cx="600" cy="200" r="18" fill="url(#nodeGlow)" filter="url(#blur4)"/>
+      <circle cx="600" cy="200" r="9" fill="#0f0f0f" stroke="#00d4aa" stroke-width="2"/>
+      <circle cx="600" cy="200" r="4" fill="#00d4aa"/>
+
+      <!-- Small car shapes -->
+      <rect x="60" y="88" width="20" height="10" rx="3" fill="#00d4aa" opacity="0.8"/>
+      <rect x="220" y="88" width="20" height="10" rx="3" fill="#00d4aa" opacity="0.8"/>
+      <rect x="440" y="88" width="20" height="10" rx="3" fill="#f97316" opacity="0.8"/>
+      <rect x="460" y="88" width="20" height="10" rx="3" fill="#f97316" opacity="0.7"/>
+      <rect x="480" y="88" width="20" height="10" rx="3" fill="#ef4444" opacity="0.9"/>
+
+      <!-- Labels -->
+      <text x="50" y="30" font-size="11" fill="#555" font-family="sans-serif">Ճանապարհային Ցանց — Երևան</text>
+      <text x="400" y="275" font-size="10" fill="#555" font-family="sans-serif" text-anchor="middle">■ Ազատ հոսք  ■ Ծանրաբեռնված  ⚠ Խցանում</text>
+      
+      <!-- Legend colored squares -->
+      <rect x="330" y="266" width="8" height="8" fill="#00d4aa" rx="1"/>
+      <rect x="384" y="266" width="8" height="8" fill="#f97316" rx="1"/>
+    </svg>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════ THEORY -->
+<section id="theory">
+  <div class="fade-in">
+    <span class="section-label">02 — Տեսություն</span>
+    <h2 class="section-title">Մաթեմատիկական Մոդելներ</h2>
+    <p class="section-intro">
+      Տրանսպորտային հոսքերի ֆիզիկան ուսումնասիրվում է երեք կապված մեծությունների 
+      հարաբերությունների միջոցով։ Այս կապն առաջացնում է «Հիմնարար Դիագրամ»—
+      քաղաքային ճանապարհային ֆիզիկայի ամենակարևոր գծապատկերն է։
+    </p>
+  </div>
+
+  <!-- Fundamental equation -->
+  <div class="formula-block fade-in">
+    <h4>Հիմնարար Հավասարում</h4>
+    <div class="formula">q = k · v</div>
+    <p class="formula-desc">
+      <strong>q</strong> — Հոսք (մեք/ժ), <strong>k</strong> — Խտություն (մեք/կմ), 
+      <strong>v</strong> — Արագություն (կմ/ժ) · Այս պարզ կապը հանդիսանում է 
+      ողջ տրանսպորտային ֆիզիկայի հիմքը։ Ինչպես ջրի հոսքի ֆիզիկայում, 
+      ավելի մեծ խտությունը հանգեցնում է ավելի ցածր արագության, 
+      ինչը կոչվում է «բջջային ֆլյուիդ» անալոգիա։
+    </p>
+  </div>
+
+  <div class="lwr-container fade-in">
+    <div>
+      <h3 style="font-size:1.3rem; font-weight:800; margin-bottom:16px; letter-spacing:-0.02em;">
+        LWR Մոդել<br>
+        <span style="color:var(--text-muted);font-size:0.85rem;font-weight:400;">Lighthill–Whitham–Richards</span>
+      </h3>
+      <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.75;margin-bottom:20px;">
+        LWR մոդելը հիդրոդինամիկայից ստացված մեթոդ է, որն ուսումնասիրում է 
+        տրանսպորտային հոսքը որպես «հեղուկ»։ Այն հիմնված է 
+        «պահպանման օրենքի» վրա — ճանապարհի ցանկացած 
+        հատվածում մտնող մեքենաների թիվը հավասար է ելնողների թվին 
+        գումարած այնտեղ մնացածների թվին։
+      </p>
+
+      <div class="formula-block" style="margin:0 0 20px 0">
+        <h4>Պահպանման Հավասարում</h4>
+        <div class="formula" style="font-size:1.2rem">∂k/∂t + ∂q/∂x = 0</div>
+        <p class="formula-desc">
+          Մասնակի ածանցյալ հավասարում, որտեղ <strong>t</strong> ժամանակ է, 
+          <strong>x</strong>՝ դիրք ճանապարհին։ Ֆիզիկական իմաստ. 
+          «ոչ մի մեքենա չի անհետանում օդում»։
+        </p>
+      </div>
+
+      <div class="formula-block" style="margin:0">
+        <h4>«Ուրախ» Ֆանտոմ Խցանումներ</h4>
+        <div class="formula" style="font-size:1.1rem">v(k) = v<sub>max</sub>(1 − k/k<sub>jam</sub>)</div>
+        <p class="formula-desc">
+          Արագությունն իջնում է, երբ խտությունն ավելանում է։ 
+          Երբ <strong>k → k<sub>jam</sub></strong>, հոսքն ամբողջությամբ 
+          կանգ է առնում՝ ձևավորելով «ֆանտոմ» կամ «ալիք» խցանում, 
+          նույնիսկ առանց վթարի կամ արգելապատնեշի։
+        </p>
+      </div>
+    </div>
+
+    <!-- Fundamental Diagram Canvas -->
+    <div>
+      <div class="diagram-wrap">
+        <div class="diagram-title">Հիմնարար Դիագրամ — q(k)</div>
+        <canvas id="fundamentalCanvas" width="400" height="280"></canvas>
+      </div>
+      <div style="margin-top:12px;font-size:0.78rem;color:var(--text-muted);text-align:center;line-height:1.6">
+        Կապույտ կետ — օպտիմալ հոսք · Նaranja — խցանման կետ
+      </div>
+    </div>
+  </div>
+
+  <!-- Speed-Density diagram -->
+  <div class="diagram-wrap fade-in" style="margin-top:40px">
+    <div class="diagram-title">Արագություն – Խտություն կախվածություն</div>
+    <canvas id="speedDensityCanvas" width="800" height="200"></canvas>
+  </div>
+
+  <!-- Three phases -->
+  <div style="margin-top:48px" class="fade-in">
+    <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:24px;letter-spacing:-0.02em;">
+      Տրաֆիկի Երեք Ֆազ
+    </h3>
+    <div class="theory-grid">
+      <div class="card" style="border-left:3px solid #28c840">
+        <div class="card-icon" style="background:rgba(40,200,64,0.1)">🟢</div>
+        <h3 style="color:#28c840">Ազատ Հոսք</h3>
+        <p>Ցածր խտություն, բարձր արագություն։ Մեքենաները ազատ շարժվում են, 
+        փոխազդեցությունը նվազ է։ 
+        <span style="color:#28c840;font-family:monospace">k &lt; 0.3 · k<sub>jam</sub></span></p>
+      </div>
+      <div class="card" style="border-left:3px solid #f97316">
+        <div class="card-icon" style="background:rgba(249,115,22,0.1)">🟡</div>
+        <h3 style="color:#f97316">Կայուն Հոսք</h3>
+        <p>Միջին խտություն, նվազող արագություն։ Ճանապարհն արդյունավետ 
+        օգտագործվում է, բայց ռիսկ կա խցանման անցման համար։</p>
+      </div>
+      <div class="card" style="border-left:3px solid #ef4444">
+        <div class="card-icon" style="background:rgba(239,68,68,0.1)">🔴</div>
+        <h3 style="color:#ef4444">Ֆանտոմ Խցանում</h3>
+        <p>Բարձր խտություն, ցածր կամ զրոյական արագություն։ 
+        «Ալիք» ձևավորվում և հակառակ ուղղությամբ տարածվում է 
+        ճանապարհով, ինչպես հնչյունային ալիք։</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════ SIMULATION -->
+<section id="simulation">
+  <div class="fade-in">
+    <span class="section-label">03 — Ինտերակտիվ Սիմուլյացիա</span>
+    <h2 class="section-title">Կյանքի Կոչված Ֆիզիկա</h2>
+    <p class="section-intro">
+      Կառավարեք մեքենաների խտությունը ցածրաձողիկի միջոցով և դիտեք, 
+      թե ինչպես է «ֆանտոմ» խցանումն ինքնաբերաբար ձևավորվում 
+      ու տարածվում ճանապարհով։
+    </p>
+  </div>
+
+  <div class="sim-layout fade-in">
+    <!-- Canvas -->
+    <div class="sim-canvas-wrap">
+      <div class="sim-canvas-header">
+        <div class="sim-dot red"></div>
+        <div class="sim-dot yellow"></div>
+        <div class="sim-dot green"></div>
+        <span style="margin-left:10px;font-size:0.78rem;color:var(--text-muted);font-family:monospace">
+          traffic_simulation.js — live
+        </span>
+        <span style="margin-left:auto;font-size:0.72rem;color:var(--accent)" id="fpsDisplay">60 fps</span>
+      </div>
+      <canvas id="simCanvas" height="200"></canvas>
+    </div>
+
+    <!-- Controls -->
+    <div class="sim-controls">
+      <h3>⚙ Կառավարում</h3>
+
+      <div class="control-group">
+        <div class="control-label">
+          <span>Մեքենաների Խտություն</span>
+          <span class="control-value" id="densityVal">30</span>
+        </div>
+        <input type="range" id="densitySlider" min="5" max="80" value="30">
+      </div>
+
+      <div class="control-group">
+        <div class="control-label">
+          <span>Առավ. Արագություն</span>
+          <span class="control-value" id="speedVal">120 կմ/ժ</span>
+        </div>
+        <input type="range" id="speedSlider" min="40" max="200" value="120">
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-val" id="metricDensity">30</div>
+          <div class="metric-label">Պլանավ. Խտություն<br>մեք/կմ</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val" id="metricSpeed">—</div>
+          <div class="metric-label">Միջին Արագություն<br>կմ/ժ</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val" id="metricFlow">—</div>
+          <div class="metric-label">Հոսք q<br>մեք/ժ</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val" id="metricPhase" style="font-size:0.9rem">Ազատ</div>
+          <div class="metric-label">Ֆազ</div>
+        </div>
+      </div>
+
+      <button class="sim-btn" id="pauseBtn">⏸ Դադարեցնել</button>
+      <button class="sim-btn" onclick="resetSim()">↺ Վերագործարկել</button>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════ SOLUTION -->
+<section id="solution">
+  <div class="fade-in">
+    <span class="section-label">04 — Մեր Լուծումը</span>
+    <h2 class="section-title">Խելացի Երթևեկության Լույսեր</h2>
+    <p class="section-intro">
+      Մաթեմատիկական մոդելների ըմբռնման հիման վրա մենք առաջարկում ենք 
+      ադապտիվ ալգորիթմ, որն իրական ժամանակում կառավարում է 
+      կանաչ ազդանշանի տևողությունը՝ նվազեցնելով խցանումները մինչև 
+      <span class="highlight-text">40%</span>-ով։
+    </p>
+  </div>
+
+  <!-- Smart light SVG demo -->
+  <div class="fade-in" style="text-align:center;margin-bottom:48px">
+    <svg viewBox="0 0 700 160" width="100%" style="max-width:700px;background:var(--bg-2);border:1px solid var(--border);border-radius:16px;display:inline-block">
+      <!-- Road -->
+      <rect x="0" y="65" width="700" height="30" fill="#141414"/>
+      <line x1="0" y1="80" x2="320" y2="80" stroke="#fff" stroke-width="1.5" stroke-dasharray="20,15" opacity="0.3"/>
+      <line x1="380" y1="80" x2="700" y2="80" stroke="#fff" stroke-width="1.5" stroke-dasharray="20,15" opacity="0.3"/>
+      
+      <!-- Traffic light post -->
+      <rect x="337" y="10" width="6" height="70" fill="#333" rx="2"/>
+      <rect x="324" y="10" width="32" height="60" fill="#1e1e1e" rx="6"/>
+      <circle cx="340" cy="25" r="8" fill="#3a0000" id="lightRed"/>
+      <circle cx="340" cy="42" r="8" fill="#3a2800" id="lightYellow"/>
+      <circle cx="340" cy="59" r="8" fill="#003a10" id="lightGreen"/>
+
+      <!-- Cars approaching -->
+      <rect x="60" y="70" width="36" height="16" rx="4" fill="#3b82f6" opacity="0.9"/>
+      <rect x="105" y="70" width="36" height="16" rx="4" fill="#3b82f6" opacity="0.8"/>
+      <rect x="152" y="70" width="36" height="16" rx="4" fill="#3b82f6" opacity="0.7"/>
+      <rect x="200" y="70" width="36" height="16" rx="4" fill="#3b82f6" opacity="0.6"/>
+      <rect x="248" y="70" width="36" height="16" rx="4" fill="#3b82f6" opacity="0.5"/>
+
+      <!-- Cars moving through (green) -->
+      <rect x="420" y="70" width="36" height="16" rx="4" fill="#00d4aa" opacity="0.9"/>
+      <rect x="480" y="70" width="36" height="16" rx="4" fill="#00d4aa" opacity="0.8"/>
+      <rect x="555" y="70" width="36" height="16" rx="4" fill="#00d4aa" opacity="0.7"/>
+      <rect x="630" y="70" width="36" height="16" rx="4" fill="#00d4aa" opacity="0.6"/>
+
+      <!-- Labels -->
+      <text x="170" y="50" text-anchor="middle" font-size="10" fill="#3b82f6" font-family="sans-serif" font-weight="600">Հերթ. k=45 մեք/կմ</text>
+      <text x="540" y="50" text-anchor="middle" font-size="10" fill="#00d4aa" font-family="sans-serif" font-weight="600">Ազատ. k=12 մեք/կմ</text>
+      <text x="340" y="145" text-anchor="middle" font-size="11" fill="#555" font-family="sans-serif">Ադապտիվ Կանաչ Ֆազ — ցածրացնում է հերթի երկայնությունը</text>
+    </svg>
+  </div>
+
+  <div class="solution-grid fade-in">
+    <div class="solution-card">
+      <div class="solution-num">01</div>
+      <h3>Իրական Ժամանակի Տվյալ</h3>
+      <p>Ճանապարհատեղամասի սենսորները (ինդուկտիվ և վիդեո) հաղորդում 
+      են k (խտություն) և v (արագություն) ամեն 5 վայրկյանը մեկ 
+      կենտրոնական կառավարման համակարգին։</p>
+    </div>
+    <div class="solution-card">
+      <div class="solution-num">02</div>
+      <h3>LWR Կանխատեսում</h3>
+      <p>Ստացված տվյալները LWR մոդելի հիման վրա կանխատեսում են 
+      հետևյալ 60–120 վայրկյանի հոսքն ու բացահայտում 
+      ձևավորվող խցանումները նախքան դրանց ի հայտ գալը։</p>
+    </div>
+    <div class="solution-card">
+      <div class="solution-num">03</div>
+      <h3>Ադապտիվ Ֆազ</h3>
+      <p>Ալգորիթմը փոփոխում է կանաչ ազդանշանի տևողությունը 
+      (10–90 վայրկ.) այնպես, որ փոխհատման ծանրաբեռնվածությունը 
+      կատարելապես հաշվեկշռված լինի բոլոր ուղղություններով։</p>
+    </div>
+  </div>
+
+  <!-- Formula for green phase duration -->
+  <div class="formula-block fade-in" style="margin-top:48px">
+    <h4>Ադապտիվ Կանաչ Ֆազի Բանաձև</h4>
+    <div class="formula" style="font-size:1.3rem">
+      G<sub>i</sub> = G<sub>min</sub> + (G<sub>max</sub> − G<sub>min</sub>) · k<sub>i</sub> / Σk<sub>j</sub>
+    </div>
+    <p class="formula-desc">
+      <strong>G<sub>i</sub></strong> — i ուղղության կանաչ ֆազի տևողությունը, 
+      <strong>k<sub>i</sub></strong> — i ուղղության ընթացիկ խտությունը, 
+      <strong>Σk<sub>j</sub></strong> — բոլոր ուղղությունների խտությունների գումարը։ 
+      Ծանրաբեռնված ուղղությունն ավտոմատ ստանում է ավելի երկար կանաչ ֆազ,
+      ինչն ապահովում է հոսքի օպտիմալ հաշվեկշիռ։
+    </p>
+  </div>
+
+  <!-- Expected results -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:48px" class="fade-in">
+    <div class="metric-card" style="padding:28px 20px">
+      <div class="metric-val" style="font-size:2.2rem;color:#28c840">−38%</div>
+      <div class="metric-label" style="font-size:0.8rem;margin-top:6px">Կրճատված Սպասելու Ժամանակ</div>
+    </div>
+    <div class="metric-card" style="padding:28px 20px">
+      <div class="metric-val" style="font-size:2.2rem;color:var(--accent)">+27%</div>
+      <div class="metric-label" style="font-size:0.8rem;margin-top:6px">Ավելացած Անցողունակություն</div>
+    </div>
+    <div class="metric-card" style="padding:28px 20px">
+      <div class="metric-val" style="font-size:2.2rem;color:#3b82f6">−22%</div>
+      <div class="metric-label" style="font-size:0.8rem;margin-top:6px">Կրճատված CO₂ Արտանետում</div>
+    </div>
+    <div class="metric-card" style="padding:28px 20px">
+      <div class="metric-val" style="font-size:2.2rem;color:#f97316">~60s</div>
+      <div class="metric-label" style="font-size:0.8rem;margin-top:6px">Կանխատեսման Հայիս</div>
+    </div>
+  </div>
+
+  <div style="margin-top:24px;display:flex;flex-wrap:wrap;gap:8px" class="fade-in">
+    <span class="tag">Python / NumPy</span>
+    <span class="tag">FiniteDifference LWR</span>
+    <span class="tag">SUMO Simulator</span>
+    <span class="tag">MQTT Sensors</span>
+    <span class="tag">TensorFlow Lite</span>
+    <span class="tag">OpenStreetMap</span>
+    <span class="tag">WebSocket API</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ FOOTER -->
+<footer>
+  <div class="footer-logo">ԵՊԲՀ Հերացի ավագ դպրոց</div>
+  <p class="footer-text">
+    Նախագիծ. <strong>10/6</strong> — 
+    Տրանսպորտային հոսքերի մաթեմատիկական մոդելավորումը քաղաքային միջավայրում<br>
+    <span style="opacity:0.5"></span>
+  </p>
+</footer>
+
+<!-- ═══════════════════════════════════════════════ JAVASCRIPT -->
+<script>
+// ── Intersection Observer for fade-in ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// Immediately trigger hero
+document.querySelector('#hero .fade-in').classList.add('visible');
+
+// ── Traffic Light Animation (solution section) ──
+(function animateLight() {
+  const red = document.getElementById('lightRed');
+  const yellow = document.getElementById('lightYellow');
+  const green = document.getElementById('lightGreen');
+  if (!red) return;
+
+  const phases = [
+    { r:'#ff3333', y:'#3a2800', g:'#003a10', dur: 3000 },  // red
+    { r:'#3a0000', y:'#ffbb00', g:'#003a10', dur: 1000 },  // yellow
+    { r:'#3a0000', y:'#3a2800', g:'#00e050', dur: 4000 },  // green
+    { r:'#3a0000', y:'#ffbb00', g:'#003a10', dur: 800  },  // yellow
+  ];
+  let i = 0;
+  function step() {
+    const p = phases[i % phases.length];
+    red.style.fill = p.r; red.style.filter = i%4===0 ? 'drop-shadow(0 0 6px #ff3333)' : '';
+    yellow.style.fill = p.y; yellow.style.filter = i%4===1||i%4===3 ? 'drop-shadow(0 0 6px #ffbb00)' : '';
+    green.style.fill = p.g; green.style.filter = i%4===2 ? 'drop-shadow(0 0 6px #00e050)' : '';
+    setTimeout(() => { i++; step(); }, p.dur);
+  }
+  step();
+})();
+
+// ── Fundamental Diagram ──
+(function drawFundamental() {
+  const canvas = document.getElementById('fundamentalCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const PAD = { l: 55, r: 25, t: 20, b: 45 };
+  const IW = W - PAD.l - PAD.r, IH = H - PAD.t - PAD.b;
+
+  const k_jam = 120, v_max = 120;
+  const kToX = k => PAD.l + (k / k_jam) * IW;
+  const qToY = q => PAD.t + IH - (q / (k_jam * v_max / 4)) * IH;
+
+  ctx.fillStyle = '#0f0f0f';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ctx.lineWidth = 1;
+  for (let i = 1; i <= 5; i++) {
+    const y = PAD.t + (i / 5) * IH;
+    ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(W - PAD.r, y); ctx.stroke();
+  }
+  for (let i = 1; i <= 6; i++) {
+    const x = PAD.l + (i / 6) * IW;
+    ctx.beginPath(); ctx.moveTo(x, PAD.t); ctx.lineTo(x, H - PAD.b); ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(PAD.l, PAD.t); ctx.lineTo(PAD.l, H - PAD.b); ctx.lineTo(W - PAD.r, H - PAD.b);
+  ctx.stroke();
+
+  // Fundamental curve
+  const pts = [];
+  for (let k = 0; k <= k_jam; k += 0.5) {
+    const v = v_max * (1 - k / k_jam);
+    const q = k * v;
+    pts.push({ x: kToX(k), y: qToY(q), k, q });
+  }
+
+  // Gradient fill under curve
+  const grad = ctx.createLinearGradient(0, PAD.t, 0, H - PAD.b);
+  grad.addColorStop(0, 'rgba(0,212,170,0.2)');
+  grad.addColorStop(1, 'rgba(0,212,170,0)');
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, H - PAD.b);
+  pts.forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.lineTo(pts[pts.length - 1].x, H - PAD.b);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Curve
+  ctx.beginPath();
+  pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+  ctx.strokeStyle = '#00d4aa';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Find peak
+  const peak = pts.reduce((a, b) => b.q > a.q ? b : a);
+  ctx.beginPath();
+  ctx.arc(peak.x, peak.y, 6, 0, Math.PI * 2);
+  ctx.fillStyle = '#3b82f6';
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.font = '11px system-ui, sans-serif';
+  ctx.fillText('q (հոսք)', PAD.l - 45, PAD.t + 10);
+  ctx.fillText('k (խտություն)', W - PAD.r - 80, H - PAD.b + 36);
+  ctx.fillStyle = '#3b82f6';
+  ctx.fillText('q_max', peak.x + 8, peak.y - 6);
+
+  // Phase regions
+  ctx.font = '9px system-ui, sans-serif';
+  ctx.fillStyle = 'rgba(40,200,64,0.6)';
+  ctx.fillText('Ազատ', PAD.l + 8, H - PAD.b - 12);
+  ctx.fillStyle = 'rgba(239,68,68,0.6)';
+  ctx.fillText('Խցան', peak.x + 18, H - PAD.b - 12);
+
+  // Vertical dashed at peak k
+  ctx.setLineDash([4, 4]);
+  ctx.strokeStyle = 'rgba(59,130,246,0.4)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(peak.x, peak.y); ctx.lineTo(peak.x, H - PAD.b);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // k tick labels
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.font = '10px monospace';
+  for (let k = 0; k <= k_jam; k += 30) {
+    ctx.fillText(k, kToX(k) - 5, H - PAD.b + 14);
+  }
+})();
+
+// ── Speed-Density Chart ──
+(function drawSpeedDensity() {
+  const canvas = document.getElementById('speedDensityCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const PAD = { l: 55, r: 25, t: 20, b: 40 };
+  const IW = W - PAD.l - PAD.r, IH = H - PAD.t - PAD.b;
+
+  ctx.fillStyle = '#0f0f0f';
+  ctx.fillRect(0, 0, W, H);
+
+  const k_jam = 120, v_max = 120;
+  const kToX = k => PAD.l + (k / k_jam) * IW;
+  const vToY = v => PAD.t + IH - (v / v_max) * IH;
+
+  // Grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth = 1;
+  for (let i = 1; i <= 4; i++) {
+    ctx.beginPath(); ctx.moveTo(PAD.l, PAD.t + i * IH / 4); ctx.lineTo(W - PAD.r, PAD.t + i * IH / 4); ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(PAD.l, PAD.t); ctx.lineTo(PAD.l, H - PAD.b); ctx.lineTo(W - PAD.r, H - PAD.b);
+  ctx.stroke();
+
+  // Empirical scatter (simulated data points)
+  const rand = (seed) => { let x = Math.sin(seed) * 10000; return x - Math.floor(x); };
+  for (let i = 0; i < 180; i++) {
+    const k = rand(i * 7 + 1) * k_jam;
+    const vIdeal = v_max * (1 - k / k_jam);
+    const noise = (rand(i * 13 + 5) - 0.5) * 15;
+    const v = Math.max(0, Math.min(v_max, vIdeal + noise));
+    const alpha = 0.35 + 0.4 * (1 - k / k_jam);
+    ctx.fillStyle = `rgba(59,130,246,${alpha.toFixed(2)})`;
+    ctx.beginPath();
+    ctx.arc(kToX(k), vToY(v), 2.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Theoretical line
+  const grad = ctx.createLinearGradient(PAD.l, 0, W - PAD.r, 0);
+  grad.addColorStop(0, '#00d4aa');
+  grad.addColorStop(0.5, '#f97316');
+  grad.addColorStop(1, '#ef4444');
+  ctx.strokeStyle = grad; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for (let k = 0; k <= k_jam; k += 1) {
+    const v = v_max * (1 - k / k_jam);
+    if (k === 0) ctx.moveTo(kToX(k), vToY(v));
+    else ctx.lineTo(kToX(k), vToY(v));
+  }
+  ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.font = '11px system-ui, sans-serif';
+  ctx.fillText('v (կմ/ժ)', PAD.l - 50, PAD.t + 10);
+  ctx.fillText('k (մեք/կմ)', W - PAD.r - 90, H - PAD.b + 32);
+
+  ctx.font = '10px monospace';
+  [0, 30, 60, 90, 120].forEach(v => {
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.fillText(v, PAD.l - 32, vToY(v) + 4);
+  });
+  [0, 30, 60, 90, 120].forEach(k => {
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.fillText(k, kToX(k) - 6, H - PAD.b + 14);
+  });
+})();
+
+// ─────────────────────────────────────────────────────────────
+// ── SIMULATION ──
+// ─────────────────────────────────────────────────────────────
+const simCanvas = document.getElementById('simCanvas');
+const simCtx = simCanvas.getContext('2d');
+
+let SIM_W, SIM_H;
+
+function resizeSim() {
+  SIM_W = simCanvas.parentElement.clientWidth;
+  SIM_H = 200;
+  simCanvas.width = SIM_W;
+  simCanvas.height = SIM_H;
+}
+
+resizeSim();
+window.addEventListener('resize', () => { resizeSim(); });
+
+const ROAD_Y = SIM_H / 2;
+const ROAD_H = 60;
+const CAR_W = 32, CAR_H = 16;
+const K_JAM = 80;
+
+let cars = [];
+let vMax = 120;
+let targetDensity = 30;
+let paused = false;
+let lastTime = 0;
+let frameCount = 0, lastFpsTime = 0;
+
+function getMaxCars() {
+  // Map density (5-80) to car count
+  return Math.round(targetDensity * SIM_W / 1200);
+}
+
+function getIdealSpeed(density) {
+  // LWR speed-density
+  const normalized = density / K_JAM;
+  return vMax * Math.max(0, 1 - normalized);
+}
+
+function spawnCars() {
+  const target = getMaxCars();
+  const spacing = SIM_W / Math.max(target, 1);
+  cars = [];
+  for (let i = 0; i < target; i++) {
+    cars.push({
+      x: i * spacing,
+      v: vMax,
+      color: null,
+      phase: 0 // for wave effect
+    });
+  }
+}
+
+spawnCars();
+
+function updateCars(dt) {
+  if (!cars.length) return;
+  const target = getMaxCars();
+  // Add/remove cars
+  while (cars.length < target) {
+    cars.push({ x: -CAR_W * 2, v: vMax, color: null, phase: 0 });
+  }
+  while (cars.length > target) {
+    cars.splice(0, 1);
+  }
+
+  // Sort by x
+  cars.sort((a, b) => a.x - b.x);
+
+  const density = targetDensity;
+  const idealV = getIdealSpeed(density);
+
+  for (let i = 0; i < cars.length; i++) {
+    const car = cars[i];
+    const next = cars[(i + 1) % cars.length];
+
+    let gap;
+    if (next.x > car.x) {
+      gap = next.x - car.x - CAR_W;
+    } else {
+      gap = (SIM_W - car.x) + next.x - CAR_W;
+    }
+
+    const safeGap = 8 + car.v * 0.15;
+    const desiredV = idealV;
+
+    if (gap < safeGap) {
+      car.v = Math.max(0, car.v - (safeGap - gap) * 1.5 * dt);
+    } else {
+      car.v += (desiredV - car.v) * 0.08;
+    }
+
+    car.v = Math.max(0, Math.min(vMax, car.v));
+    car.x = (car.x + car.v * dt * 0.03 + SIM_W) % SIM_W;
+  }
+}
+
+function getPhase(density) {
+  const k = density / K_JAM;
+  if (k < 0.3) return { name: 'Ազատ', color: '#28c840' };
+  if (k < 0.65) return { name: 'Կայուն', color: '#f97316' };
+  return { name: 'Խցան', color: '#ef4444' };
+}
+
+function drawRoad() {
+  const ctx = simCtx;
+  const W = SIM_W, H = SIM_H;
+
+  // Background
+  ctx.fillStyle = '#060a0f';
+  ctx.fillRect(0, 0, W, H);
+
+  // Road surface
+  const ry = (H - ROAD_H) / 2;
+  ctx.fillStyle = '#111820';
+  ctx.fillRect(0, ry, W, ROAD_H);
+
+  // Road edges
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(0, ry); ctx.lineTo(W, ry); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, ry + ROAD_H); ctx.lineTo(W, ry + ROAD_H); ctx.stroke();
+
+  // Center dashes
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([20, 18]);
+  ctx.beginPath(); ctx.moveTo(0, H / 2); ctx.lineTo(W, H / 2); ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function carColor(v, vMax) {
+  const t = v / vMax;
+  if (t > 0.7) return '#00d4aa';
+  if (t > 0.35) return '#f97316';
+  return '#ef4444';
+}
+
+function drawCars() {
+  const ctx = simCtx;
+  const ry = (SIM_H - ROAD_H) / 2;
+  const carY = ry + (ROAD_H - CAR_H) / 2;
+
+  cars.forEach(car => {
+    const col = carColor(car.v, vMax);
+
+    // Glow
+    ctx.shadowColor = col;
+    ctx.shadowBlur = 6;
+    ctx.fillStyle = col;
+    ctx.beginPath();
+    roundRect(ctx, car.x, carY, CAR_W, CAR_H, 4);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Windshield
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(car.x + CAR_W * 0.55, carY + 3, CAR_W * 0.3, CAR_H - 6);
+
+    // Headlights
+    ctx.fillStyle = 'rgba(255,240,180,0.9)';
+    ctx.fillRect(car.x + CAR_W - 4, carY + 3, 3, 4);
+    ctx.fillRect(car.x + CAR_W - 4, carY + CAR_H - 7, 3, 4);
+  });
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function updateMetrics() {
+  const avgSpeed = cars.length
+    ? Math.round(cars.reduce((s, c) => s + c.v, 0) / cars.length)
+    : 0;
+  const flow = Math.round(targetDensity * avgSpeed);
+  const phase = getPhase(targetDensity);
+
+  document.getElementById('metricDensity').textContent = targetDensity;
+  document.getElementById('metricSpeed').textContent = avgSpeed;
+  document.getElementById('metricFlow').textContent = flow;
+  const mp = document.getElementById('metricPhase');
+  mp.textContent = phase.name;
+  mp.style.color = phase.color;
+
+  document.getElementById('densityVal').textContent = targetDensity;
+  document.getElementById('speedVal').textContent = vMax + ' կմ/ժ';
+}
+
+function loop(ts) {
+  if (!paused) {
+    const dt = Math.min((ts - lastTime) / 16.67, 3);
+    lastTime = ts;
+
+    updateCars(dt);
+    drawRoad();
+    drawCars();
+    updateMetrics();
+  }
+
+  // FPS
+  frameCount++;
+  if (ts - lastFpsTime > 1000) {
+    const fps = Math.round(frameCount * 1000 / (ts - lastFpsTime));
+    const fpsEl = document.getElementById('fpsDisplay');
+    if (fpsEl) fpsEl.textContent = fps + ' fps';
+    frameCount = 0;
+    lastFpsTime = ts;
+  }
+
+  requestAnimationFrame(loop);
+}
+
+requestAnimationFrame(ts => { lastTime = ts; lastFpsTime = ts; loop(ts); });
+
+// Sliders
+document.getElementById('densitySlider').addEventListener('input', function() {
+  targetDensity = parseInt(this.value);
+});
+
+document.getElementById('speedSlider').addEventListener('input', function() {
+  vMax = parseInt(this.value);
+});
+
+document.getElementById('pauseBtn').addEventListener('click', function() {
+  paused = !paused;
+  this.textContent = paused ? '▶ Շարունակել' : '⏸ Դադարեցնել';
+});
+
+function resetSim() {
+  targetDensity = 30;
+  vMax = 120;
+  document.getElementById('densitySlider').value = 30;
+  document.getElementById('speedSlider').value = 120;
+  spawnCars();
+}
+</script>
+</body>
+</html>
